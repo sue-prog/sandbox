@@ -1,0 +1,14 @@
+import express from 'express';
+
+const app = express();
+app.use(express.json());
+
+// Temporary root endpoint so we know the backend is alive
+app.get('/', (req, res) => {
+  res.send('Analytics backend is running');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Analytics backend running on port ${PORT}`);
+});
