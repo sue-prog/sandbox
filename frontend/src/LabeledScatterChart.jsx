@@ -6,6 +6,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Line,
   Cell
 } from "recharts";
 
@@ -14,10 +15,50 @@ import InstructorLegend from "./components/InstructorLegend";
 import useLasso from "./components/useLasso";
 import LassoLayer from "./components/LassoLayer";
 import HighlightedDot from "./components/HighlightedDot";
+import DetailsPanel from "./components/DetailsPanel";
+import { linearRegression } from "./utils/linearRegression";
+
 
 export default function LabeledScatterChart({ data }) {
   const [selectedInstructors, setSelectedInstructors] = useState([]);
   const [selectedPoints, setSelectedPoints] = useState([]);
+  const [removedPoints, setRemovedPoints] = useState([]);
+
+// 1. Compute the dataset that is actually visible on the chart
+const visibleData = data.filter(
+  (p) => !removedPoints.includes(p.student)
+);
+
+// 2. Compute regression ONLY from visible points
+const regression = linearRegression(visibleData);
+
+// 3. Build two points for the trendline
+let trendlinePoints = [];
+if (regression) {
+  trendlinePoints = [
+    { pct: 0, hours: regression.intercept },
+    { pct: 100, hours: regression.slope * 100 + regression.intercept }
+  ];
+}
+
+  const [showDetails, setShowDetails] = useState(false);
+
+  const handleApply = (ids, action) => {
+  if (action === "delete") {
+  setRemovedPoints((prev) => [...prev, ...ids]);
+
+  // also remove them from the selection
+  setSelectedPoints((prev) => prev.filter((id) => !ids.includes(id)));
+  }
+
+
+  if (action === "keep") {
+    setSelectedPoints(ids);
+  }
+
+  setShowDetails(false);
+};
+
 
   // Store cx/cy WITHOUT mutating data
   const pointCoords = useRef({});
@@ -100,7 +141,7 @@ export default function LabeledScatterChart({ data }) {
 
           <Scatter
             name="Students"
-            data={data}
+            data={visibleData.filter((p) => !removedPoints.includes(p.student))}
             isAnimationActive={false}
             shape={(props) => {
             console.log("cx, cy:", props.cx, props.cy);
@@ -128,7 +169,6 @@ export default function LabeledScatterChart({ data }) {
           : [...prev, id]
        );
   }}
-
           >
             {data.map((p, i) => {
               const isVisible =
@@ -144,6 +184,18 @@ export default function LabeledScatterChart({ data }) {
               );
             })}
           </Scatter>
+          {regression && (
+          <Line
+          type="linear"
+          data={trendlinePoints}
+          dataKey="hours"
+          stroke="#333"
+          strokeWidth={2}
+          dot={false}
+          isAnimationActive={false}
+         />
+         )}
+
          </ScatterChart>
 
         {/* Lasso rectangle overlay */}
@@ -183,6 +235,43 @@ export default function LabeledScatterChart({ data }) {
         </svg>
       </div>
   
+{selectedPoints.length > 0 && (
+  <div
+    style={{
+      marginTop: "10px",
+      padding: "8px 12px",
+      background: "#f5f5f5",
+      border: "1px solid #ccc",
+      borderRadius: "6px",
+      width: "fit-content"
+    }}
+  >
+    <strong>{selectedPoints.length} selected</strong>
+
+    <button
+      style={{ marginLeft: "12px" }}
+      onClick={() => setShowDetails(true)}
+    >
+      View Details
+    </button>
+
+    <button
+      style={{ marginLeft: "8px" }}
+      onClick={() => setSelectedPoints([])}
+    >
+      Clear
+    </button>
+  </div>
+)}
+{showDetails && (
+  <DetailsPanel
+    selected={data.filter((p) => selectedPoints.includes(p.student))}
+    onClose={() => setShowDetails(false)}
+    onApply={handleApply} 
+  />
+)}
+
+
       <InstructorLegend
         uniqueInstructors={uniqueInstructors}
         selectedInstructors={selectedInstructors}
