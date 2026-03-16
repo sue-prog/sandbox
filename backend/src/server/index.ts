@@ -1,13 +1,23 @@
 import express from 'express';
+import cors from 'cors';
+
 import routes from './routes';
+import { registerStageCheckRoutes } from "./routes";
 
 const app = express();
-import cors from 'cors';
-app.use(cors());
+
+//  CORS MUST COME FIRST
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 
 app.use(express.json());
 
-// mount all routes
+//  THEN register your API routes
+registerStageCheckRoutes(app);
+
+//  THEN mount your other routes
 app.use('/', routes);
 
 const PORT = process.env.PORT || 3000;
