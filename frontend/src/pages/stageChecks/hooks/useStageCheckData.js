@@ -31,6 +31,7 @@ export default function useStageCheckData(courseId) {
     courseName: data?.courseName,
     repeatRateData: data?.repeatRateData || [],
     gradingData: data?.gradingData || [],
-    flightsToStageData: data?.flightsToStageData || []
+    flightsToStageData: data?.flightsToStageData || [],
+    prematureSignoffData: data?.prematureSignoffData || []
   };
 }

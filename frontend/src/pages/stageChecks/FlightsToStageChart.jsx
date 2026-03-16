@@ -16,7 +16,7 @@ export default function FlightsToStageChart({ data }) {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="stage" />
         <YAxis />
-        <Tooltip />
+        <Tooltip isAnimationActive={false}/>
         <Bar dataKey="avgFlights" fill="#2196f3" />
       </BarChart>
     </div>

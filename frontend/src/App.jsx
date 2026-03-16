@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from "react-router-dom";
 import StudentFlightHoursPage from "./pages/studentFlightHours/StudentFlightHoursPage";
 import StageChecksPage from "./pages/stageChecks/StageChecksPage";
+import InstructorQualityPage from "./pages/instructorQuality/InstructorQualityPage";
 
 export default function App() {
   return (
@@ -34,6 +35,13 @@ export default function App() {
       <span>Pass/fail trends, timing, and performance insights.</span>
     </Link>
   </li>
+    <br />
+    <li>
+    <Link to={"/instructor-quality/test-course"}>
+      <strong>Instructor Quality Metrics</strong><br />
+      <span>Fail rate for stage checks indicating premature signoff.</span>
+    </Link>
+  </li>
 </ul>
 
 </div>
@@ -41,6 +49,7 @@ export default function App() {
       />
       <Route path="/scatter/:courseId" element={<StudentFlightHoursPage />} />
       <Route path="/stage-checks/:courseId" element={<StageChecksPage />} />
+      <Route path="/instructor-quality/:courseId" element={<InstructorQualityPage />} />
     </Routes>
   );
 }

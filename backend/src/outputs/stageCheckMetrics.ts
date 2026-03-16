@@ -1,4 +1,5 @@
 export function computeStageCheckMetrics(shaped: any[]) {
+  
   // --- 1. Repeat Rate Metrics ---
   const repeatRateByStage: Record<string, any> = {};
 
@@ -42,6 +43,7 @@ export function computeStageCheckMetrics(shaped: any[]) {
         total: 0,
         passed: 0,
         failed: 0,
+        incomplete: 0,
         continuation: 0
       };
     }
@@ -49,6 +51,7 @@ export function computeStageCheckMetrics(shaped: any[]) {
     gradingByInstructor[inst].total += 1;
     if (row.passed) gradingByInstructor[inst].passed += 1;
     if (row.failed) gradingByInstructor[inst].failed += 1;
+    if (row.incomplete) gradingByInstructor[inst].incomplete += 1;
     if (row.continuation) gradingByInstructor[inst].continuation += 1;
   }
 
@@ -75,11 +78,51 @@ export function computeStageCheckMetrics(shaped: any[]) {
     })
   );
 
+  // --- 4. Premature Signoff Metrics ---
+  const prematureByInstructor: Record<string, any> = {};
+
+  for (const row of shaped) {
+    const inst = row.primaryInstructor || "Unknown";
+
+    if (!prematureByInstructor[inst]) {
+      prematureByInstructor[inst] = {
+        instructor: inst,
+        recommended: 0,
+        passed: 0,
+        failed: 0,
+        incomplete: 0,
+        continuation: 0,
+        prematureRate: 0
+      };
+    }
+
+    prematureByInstructor[inst].recommended += 1;
+    if (row.failed) prematureByInstructor[inst].failed += 1;
+    if (row.passed) prematureByInstructor[inst].passed += 1;
+    if (row.incomplete) prematureByInstructor[inst].incomplete += 1;
+    if (row.continuation) prematureByInstructor[inst].continuation += 1;
+  }
+
+  // compute percentages
+  for (const inst of Object.values(prematureByInstructor)) {
+    const nonPass =
+      inst.failed +
+      inst.incomplete +
+      (inst.continuation || 0);
+
+    inst.prematureRate =
+    inst.recommended > 0 ? nonPass / inst.recommended : 0;
+  }
+
+  const prematureSignoffData = Object.values(prematureByInstructor);
+
+  console.log("Premature signoff:", prematureSignoffData);
 
   // --- Return all three datasets ---
   return {
     repeatRateData,
     gradingData,
-    flightsToStageData
+    flightsToStageData,
+    prematureSignoffData
   };
 }

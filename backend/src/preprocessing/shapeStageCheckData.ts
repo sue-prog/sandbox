@@ -29,7 +29,8 @@ export function shapeStageCheckData(rows: any[], courseName: string) {
     // Normalize pass/fail
     const grade = (r["Lesson Grade"] || "").trim().toUpperCase();
     const passed = grade === "COMPLETE";
-    const failed = grade === "UNSATISFACTORY" || grade === "INCOMPLETE";
+    const failed = grade === "UNSATISFACTORY";
+    const incomplete = grade === "INCOMPLETE";
     const continuation = grade === "CONTINUE";
 
     // Compute flights before stage (same student, same course, earlier date)
@@ -67,6 +68,7 @@ export function shapeStageCheckData(rows: any[], courseName: string) {
       attempt: Number(r.Attempt) || 1,
       passed,
       failed,
+      incomplete,
       continuation,
       flightsBeforeStage
     };

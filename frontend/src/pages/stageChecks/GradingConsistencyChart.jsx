@@ -5,10 +5,9 @@ export default function GradingConsistencyChart({ data }) {
     instructor: d.instructor,
     passed: d.passed,
     failed: d.failed,
+    incomplete: d.incomplete,
     continuation: d.continuation
   }));
-
-      console.log("Grading Consistency data:", data);
 
   return (
     <div>
@@ -18,10 +17,11 @@ export default function GradingConsistencyChart({ data }) {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="instructor" />
         <YAxis />
-        <Tooltip />
+        <Tooltip isAnimationActive={false} />
         <Legend />
         <Bar dataKey="passed" stackId="a" fill="#4caf50" />
         <Bar dataKey="failed" stackId="a" fill="#f44336" />
+        <Bar dataKey="incomplete" stackId="a" fill="#9c27b0" /> 
         <Bar dataKey="continuation" stackId="a" fill="#ff9800" />
       </BarChart>
     </div>

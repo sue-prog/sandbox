@@ -16,7 +16,7 @@ export default function RepeatRateChart({ data }) {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="stage" />
         <YAxis unit="%" />
-        <Tooltip />
+        <Tooltip isAnimationActive={false} />
         <Bar dataKey="repeatRate" fill="#8884d8" />
       </BarChart>
     </div>
