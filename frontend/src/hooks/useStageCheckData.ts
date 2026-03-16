@@ -5,6 +5,9 @@ export function useStageCheckData(courseId: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+console.log("Hook raw API response:", data);
+
+
   useEffect(() => {
     async function load() {
       try {
@@ -25,12 +28,21 @@ export function useStageCheckData(courseId: string) {
     load();
   }, [courseId]);
 
+  console.log("Hook final values:", {
+  lessonFrictionData: data?.lessonFrictionData,
+  repeatRateData: data?.repeatRateData,
+  gradingData: data?.gradingData,
+  flightsToStageData: data?.flightsToStageData
+});
+
+
   return {
     loading,
     error,
     courseName: data?.courseName,
     repeatRateData: data?.repeatRateData || [],
     gradingData: data?.gradingData || [],
-    flightsToStageData: data?.flightsToStageData || []
+    flightsToStageData: data?.flightsToStageData || [],
+    lessonFrictionData: data?.lessonFrictionData || []
   };
 }

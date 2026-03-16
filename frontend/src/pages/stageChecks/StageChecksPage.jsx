@@ -3,6 +3,8 @@ import RepeatRateChart from "./RepeatRateChart";
 import GradingConsistencyChart from "./GradingConsistencyChart";
 import FlightsToStageChart from "./FlightsToStageChart";
 import useStageCheckData from "./hooks/useStageCheckData";
+import LessonFrictionChart from "./LessonFrictionChart";
+
 
 export default function StageChecksPage() {
   // 1. ALL HOOKS MUST BE AT THE TOP, ALWAYS IN THE SAME ORDER
@@ -13,7 +15,8 @@ export default function StageChecksPage() {
     courseName,
     repeatRateData,
     gradingData,
-    flightsToStageData
+    flightsToStageData,
+    lessonFrictionData
   } = useStageCheckData(courseId);
 
   // 2. CONDITIONAL RETURNS ARE OK *AFTER* ALL HOOKS
@@ -28,6 +31,8 @@ export default function StageChecksPage() {
       <RepeatRateChart data={repeatRateData} />
       <GradingConsistencyChart data={gradingData} />
       <FlightsToStageChart data={flightsToStageData} />
+      <LessonFrictionChart data={lessonFrictionData} />
+
     </div>
   );
 }

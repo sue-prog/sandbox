@@ -116,13 +116,49 @@ export function computeStageCheckMetrics(shaped: any[]) {
 
   const prematureSignoffData = Object.values(prematureByInstructor);
 
-  console.log("Premature signoff:", prematureSignoffData);
+  // --- 5. Lesson Friction Metrics ---
+const lessonFriction: Record<string, any> = {};
+
+for (const row of shaped) {
+  const lesson = row.lessonName || "Unknown";
+
+  if (!lessonFriction[lesson]) {
+    lessonFriction[lesson] = {
+      lesson,
+      total: 0,
+      passed: 0,
+      failed: 0,
+      incomplete: 0,
+      continuation: 0,
+      attempts: []
+    };
+  }
+
+  lessonFriction[lesson].total += 1;
+
+  if (row.passed) lessonFriction[lesson].passed += 1;
+  if (row.failed) lessonFriction[lesson].failed += 1;
+  if (row.incomplete) lessonFriction[lesson].incomplete += 1;
+  if (row.continuation) lessonFriction[lesson].continuation += 1;
+
+  lessonFriction[lesson].attempts.push(row.attempt);
+}
+
+const lessonFrictionData = Object.values(lessonFriction).map(l => ({
+  ...l,
+  avgAttempts:
+    l.attempts.length > 0
+      ? l.attempts.reduce((a, b) => a + b, 0) / l.attempts.length
+      : 1
+}));
+
 
   // --- Return all three datasets ---
   return {
     repeatRateData,
     gradingData,
     flightsToStageData,
-    prematureSignoffData
+    prematureSignoffData, 
+    lessonFrictionData
   };
 }

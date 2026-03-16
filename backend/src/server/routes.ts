@@ -4,6 +4,8 @@ import { courseMap } from "../courseMap";
 import { loadStageChecks } from "../loaders/loadStageChecks";
 import { shapeStageCheckData } from "../preprocessing/shapeStageCheckData";
 import { computeStageCheckMetrics } from "../outputs/stageCheckMetrics";
+import { shapeAllLessonData } from "../preprocessing/shapeAllLessonData";
+import { computeLessonFriction } from "../outputs/computeLessonFriction";
 
 const router = Router();
 
@@ -26,17 +28,20 @@ export function registerStageCheckRoutes(app: any) {
     const raw = loadStageChecks();
 
     // Shape the data for this course
-    const shaped = shapeStageCheckData(raw, courseName);
+    const stageChecks = shapeStageCheckData(raw, courseName);
+    const allLessons = shapeAllLessonData(raw, courseName);
 
     // Compute analytics
-    const metrics = computeStageCheckMetrics(shaped);
+   const stageCheckMetrics = computeStageCheckMetrics(stageChecks);
+   const lessonFrictionData = computeLessonFriction(allLessons);
 
     // Return everything to the frontend
     res.json({
-      courseId,
-      courseName,
-      ...metrics
-    });
+    courseId,
+    courseName,
+    ...stageCheckMetrics,
+    lessonFrictionData
   });
+});
 }
 
