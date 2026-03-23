@@ -6,7 +6,7 @@ import useStageCheckData from "./hooks/useStageCheckData";
 import LessonFrictionChart from "./LessonFrictionChart";
 
 
-export default function StageChecksPage() {
+export default function StageChecksPage({ shapedData }) {
   // 1. ALL HOOKS MUST BE AT THE TOP, ALWAYS IN THE SAME ORDER
   const { courseId } = useParams();
   const {
@@ -17,7 +17,7 @@ export default function StageChecksPage() {
     gradingData,
     flightsToStageData,
     lessonFrictionData
-  } = useStageCheckData(courseId);
+  } = useStageCheckData(courseId, shapedData);
 
   // 2. CONDITIONAL RETURNS ARE OK *AFTER* ALL HOOKS
   if (loading) return <div>Loading stage‑check analytics…</div>;

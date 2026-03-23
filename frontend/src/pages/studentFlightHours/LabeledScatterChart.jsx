@@ -20,6 +20,7 @@ import { linearRegression } from "../../utils/linearRegression";
 
 
 export default function LabeledScatterChart({ data }) {
+
   const [selectedInstructors, setSelectedInstructors] = useState([]);
   const [selectedPoints, setSelectedPoints] = useState([]);
   const [removedPoints, setRemovedPoints] = useState([]);
@@ -63,7 +64,14 @@ if (regression) {
   // Store cx/cy WITHOUT mutating data
   const pointCoords = useRef({});
 
-  const uniqueInstructors = [...new Set(data.map(p => p.instructor))];
+  const safeData = Array.isArray(data) ? data : [];
+
+  const uniqueInstructors = [
+    ...new Set(
+      safeData
+        .map(p => p?.instructor ?? "Unknown")
+    )
+  ];
 
   const {
     isDragging,
@@ -139,62 +147,67 @@ if (regression) {
             isAnimationActive={false}
           />
 
-          <Scatter
-            name="Students"
-            data={visibleData.filter((p) => !removedPoints.includes(p.student))}
-            isAnimationActive={false}
-            shape={(props) => {
-            console.log("cx, cy:", props.cx, props.cy);
-
-          // Store coordinates in a safe external map
-              pointCoords.current[props.payload.student] = {
+        <Scatter
+          name="Students"
+          data={visibleData.filter((p) => !removedPoints.includes(p.student))}
+          isAnimationActive={false}
+          shape={(props) => {
+            // Store coordinates for lasso
+            pointCoords.current[props.payload.student] = {
               cx: props.cx,
               cy: props.cy
-              };
+            };
 
-           return (
-          <HighlightedDot
-           {...props}
-          selected={selectedPoints.includes(props.payload.student)}
-         />
-        );
-        }}
-
+            return (
+              <HighlightedDot
+                key={props.payload.student}   // ⭐ required key
+                {...props}
+                selected={selectedPoints.includes(props.payload.student)}
+              />
+            );
+          }}
           onClick={(data) => {
-          console.log("POINT CLICKED", data);
-          const id = data.payload.student;
-          setSelectedPoints(prev =>
-          prev.includes(id)
-          ? prev.filter(x => x !== id)
-          : [...prev, id]
-       );
-  }}
-          >
-            {data.map((p, i) => {
+            const id = data.payload.student;
+            setSelectedPoints(prev =>
+              prev.includes(id)
+                ? prev.filter(x => x !== id)
+                : [...prev, id]
+            );
+          }}
+        >
+          {visibleData
+            .filter((p) => !removedPoints.includes(p.student))
+            .map((p) => {
               const isVisible =
                 selectedInstructors.length === 0 ||
                 selectedInstructors.includes(p.instructor);
 
               return (
                 <Cell
-                  key={i}
+                  key={p.student}   // ⭐ stable key
                   fill={isVisible ? colorMap[p.instructor] : dimColor}
                   fillOpacity={isVisible ? 1 : dimOpacity}
                 />
               );
             })}
-          </Scatter>
+        </Scatter>
+
+
           {regression && (
           <Line
-          type="linear"
-          data={trendlinePoints}
-          dataKey="hours"
-          stroke="#333"
-          strokeWidth={2}
-          dot={false}
-          isAnimationActive={false}
-         />
-         )}
+            type="linear"
+            data={trendlinePoints.map((pt, i) => ({
+              ...pt,
+              key: `trend-${i}`   //  add a stable key for each point
+            }))}
+            dataKey="hours"
+            stroke="#333"
+            strokeWidth={2}
+            dot={false}
+            isAnimationActive={false}
+          />
+        )}
+
 
          </ScatterChart>
 
@@ -216,7 +229,7 @@ if (regression) {
             startDrag(e.clientX - rect.left, e.clientY - rect.top);
           }}
           onMouseMove={(e) => {
-          console.log("overlay mousemove");   // debug log
+//          console.log("overlay mousemove");   // debug log
 
             if (!isDragging) return;
             const rect = e.currentTarget.getBoundingClientRect();
@@ -230,7 +243,6 @@ if (regression) {
             }
           }}
         >
-          {console.log("overlay mounted")} 
           <LassoLayer dragStart={dragStart} dragEnd={dragEnd} />
         </svg>
       </div>

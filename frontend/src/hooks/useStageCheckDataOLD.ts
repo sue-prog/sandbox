@@ -1,22 +1,33 @@
 import { useEffect, useState } from "react";
 
-export default function useStageCheckData(courseId, shapedData) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+type StageCheckHookResult = {
+  loading: boolean;
+  error: string | null;
+  courseName: string | undefined;
+  repeatRateData: any[];
+  gradingData: any[];
+  flightsToStageData: any[];
+  lessonFrictionData: any[];
+};
+
+export function useStageCheckData(
+  courseId: string,
+  shapedData: any
+): StageCheckHookResult {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!courseId || !shapedData) return;
-
     const decoded = decodeURIComponent(courseId);
-    const course = shapedData[decoded];
+    const course = shapedData?.[decoded];
 
     setData({
       courseName: decoded,
       repeatRateData: course?.stageChecks || [],
       gradingData: course?.stageChecks || [],
       flightsToStageData: course?.stageChecks || [],
-      lessonFrictionData: course?.allLessonsFromStageCheckFile || []
+      lessonFrictionData: course?.stageChecks || []
     });
 
     setLoading(false);

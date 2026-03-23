@@ -6,6 +6,8 @@ export default function InstructorLegend({
   setSelectedInstructors,
   colorMap
 }) {
+//  console.log("uniqueInstructors:", uniqueInstructors);
+
   return (
     <div style={{ marginTop: 20 }}>
       <h3>Instructors</h3>
