@@ -5,7 +5,20 @@ import OpenAI from "openai";
 
 export async function handler(event, context) {
   try {
-    const body = JSON.parse(event.body);
+    let prompt = null;
+
+    if (event.body) {
+      try {
+        const body = JSON.parse(event.body);
+        prompt = body.prompt;
+      } catch (err) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ error: "Invalid JSON body" })
+        };
+      }
+    }
+
     let prompt = null;
     
     if (event.body) {
