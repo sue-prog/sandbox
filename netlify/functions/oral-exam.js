@@ -37,10 +37,10 @@ export async function handler(event, context) {
       body: JSON.stringify(json)
     };
   } catch (err) {
-    console.error("LLM backend error:", err);
-    return {
+     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "LLM backend failure" })
-    };
-  }
+      body: JSON.stringify({ error: err.message, stack: err.stack })
+  };
+}
+
 }
