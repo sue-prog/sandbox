@@ -27,10 +27,28 @@ export async function handler(event, context) {
       temperature: 0.2
     });
 
-    const text = completion.choices[0].message.content;
+    const text = completion.choices?.[0]?.message?.content;
+    
+    if (!text) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Model returned no content" })
+      };
+    }
+    
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch (parseErr) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "Model did not return valid JSON",
+          raw: text
+        })
+      };
+    }
 
-    // The model returns JSON text — parse it
-    const json = JSON.parse(text);
 
     return {
       statusCode: 200,
